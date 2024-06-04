@@ -146,3 +146,48 @@ while True:
 
     elif event in ("Save", "Save As"):
         save_file(values["_text_"]) if event == "Save" else save_as(values["_text_"])
+
+    elif event == "Word Count":
+        count = word_count(values["_text_"])
+        sg.popup(f"Word Count: {count}")
+
+    elif event == "Find":
+        query = sg.popup_get_text("Enter text to find:", title="Find")
+        if query:
+            matches = list(find_text(values["_text_"], query))
+            if matches:
+                for start, end in matches:
+                    text_element.update(
+                        background_color_for_value=(start, end, "yellow"),
+                        text_color_for_value=(start, end, "black"),
+                    )
+            else:
+                sg.popup_notify("Text not found.")
+    
+    elif event == "Replace":
+        find_text = sg.popup_get_text("Find text:", title="Replace")
+        replace_text = sg.popup_get_text("Replace with:", title="Replace")
+        if find_text and replace_text:
+            new_text = values["_text_"].replace(find_text, replace_text)
+            text_element.update(new_text)
+    
+    elif event in ("Upper", "Lower", "Title"):
+        new_text = change_case(values["_text_"], event)
+        text_element.update(new_text)
+    
+    elif event == "Dark Mode":
+        toggle_dark_mode(window)
+
+    elif event in ("Arial", "Courier New", "Helvetica", "Times New Roman"):
+        current_font = event
+    elif event in ("8", "11", "14", "18", "22"):
+        current_size = int(event)
+    elif event == "Version":
+        about()
+
+    text_element.update(font=(current_font, current_size))
+    window["_status_"].update(
+        f"Font: {current_font} {current_size} | Words: {word_count(values['_text_'])}"
+    )
+
+window.close()
